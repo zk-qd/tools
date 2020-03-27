@@ -21,8 +21,8 @@ var HttpKit_Uri = {
             return querystring;
         }
     },
-    uri3query/* 合并uri以及query */(uri, params) {
-        var querystring = query2string(params);
+    uri3query/* 合并uri以及query */(uri, ...params) {
+        var querystring = query2string({...params});
         // 连接
         uri.indexOf('?') == -1 ? uri += '?' + querystring : uri += querystring;
         return uri;
