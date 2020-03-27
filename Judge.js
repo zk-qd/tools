@@ -1,7 +1,3 @@
-var JudgeKit = {
-    ...JudgeKit_Judge,
-}
-
 
 
 var JudgeKit_Judge = {
@@ -21,3 +17,8 @@ var JudgeKit_Judge = {
         else return value;
     },
 }
+
+var JudgeKit = {
+    ...JudgeKit_Judge,
+}
+

@@ -1,15 +1,11 @@
-var HttpKit = {
-    ...HttpKit_Judge,
-    ...HttpKit_Uri,
-}
 
 
 var HttpKit_Judge = {
 
 }
-
 var HttpKit_Uri = {
-    query2string/* query转字符串 */(params) {
+    query2string/* query转字符串 */(...params) {
+        params = params.reduce((total, item) => ({ ...total, ...item }), {})
         var querystring = '';
         if (params) {
             for (let key in params) {
@@ -22,7 +18,7 @@ var HttpKit_Uri = {
         }
     },
     uri3query/* 合并uri以及query */(uri, ...params) {
-        var querystring = query2string({ ...params });
+        var querystring = this.query2string(...params);
         // 连接
         uri.indexOf('?') == -1 ? uri += '?' + querystring : uri += querystring;
         return uri;
@@ -45,7 +41,7 @@ var HttpKit_Uri = {
     },
     // 如果为0也需要清除  推荐使用这种 默认清除undefined以及null和空字符串
     clear1assignVoid/* 清除指定的属性 */(obj, assign = [], filter = 'clear1allVoid') {
-        obj = this[clear1void](obj);
+        obj = this[filter](obj);
         for (let key in obj) {
             var value = obj[key];
             assign.forEach(item => {
@@ -54,4 +50,9 @@ var HttpKit_Uri = {
         }
         return obj;
     }
+}
+
+var HttpKit = {
+    ...HttpKit_Judge,
+    ...HttpKit_Uri,
 }
