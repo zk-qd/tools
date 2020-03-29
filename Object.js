@@ -1,6 +1,6 @@
 
 var ObjectKit = {
-    sCopy: function (obj) {
+    deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
             o = {};
@@ -17,8 +17,12 @@ var ObjectKit = {
             o = obj.valueOf();
         }
         return o;
-    }
+    }    
 }
+
+// 判断简单类型复杂类型是否相等
+
+
 
 
 // 依赖方法
