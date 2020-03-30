@@ -7,13 +7,18 @@ const merge = './merge.js';
 // 删除
 fs.unlinkSync(merge);
 // 创建
-fs.writeFileSync(merge,'');
+fs.writeFileSync(merge, '');
 
 // 文件集合
-const result = fs.readdirSync(targetFolder);
+let result = fs.readdirSync(targetFolder);
+
+
 
 // 判断并写入
 result.forEach(item => {
+    // 排除json和lock文件
+    if (item.match(/\.json$/g)) return false;
+    if (item.match(/\.lock$/g)) return false;
     let relative = targetFolder + '/' + item;
     let query = fs.statSync(relative);
     // 筛选
