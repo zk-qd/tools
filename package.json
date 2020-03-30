@@ -1,0 +1,12 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "description": "kit",
+  "main": "index.js",
+  "repository": "git@github.com:zk-qd/tools.git",
+  "author": "zk-qd <2605066922@qq.com>",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^3.0.0"
+  }
+}
