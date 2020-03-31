@@ -1,5 +1,5 @@
 
-
+// universal judge
 var JudgeKit_Judge = {
     void2empty/* 转换undefined以及null */(value) {
         if (value == undefined) return '';

@@ -1,6 +1,7 @@
 
+
 var DateKit = {
-    dateFormat: function (date, format) {
+    dateFormat:/* data format */ function (date, format) {
         if (!date) date = new Date();
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
@@ -21,6 +22,4 @@ var DateKit = {
         return format;
     }
 }
-
-
 // dateFormat(new Date(),'yyyy-MM-dd hh:mm:ss');

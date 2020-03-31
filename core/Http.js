@@ -3,6 +3,7 @@
 var HttpKit_Judge = {
 
 }
+// correlation uri
 var HttpKit_Uri = {
     query2string/* query转字符串 */(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})

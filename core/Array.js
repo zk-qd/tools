@@ -2,7 +2,7 @@ var ArrayKit = {
 
 }
 
-// 数组去重
+// array to heavy
 
 
 // 
