@@ -2,20 +2,14 @@
 var ArrayKit = {
 
 }
-
-// 数组去重
-
-
-// 
-
 //Date.js
 
+
 var DateKit = {
-    dateFormat: function (date, format) {
+    dateFormat:/* data format */ function (date, format) {
         if (!date) date = new Date();
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
-        // 注意月份是 MM 分钟是mm
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
@@ -32,13 +26,50 @@ var DateKit = {
         return format;
     }
 }
-
-
-// dateFormat(new Date(),'yyyy-MM-dd hh:mm:ss');
-
 //Form.js
 
+var FormKit_Operation = {
+    getForm({ formSel, prefix } = /* 依赖error */ErrorKit.emptyParameterException()) {
+        var form = document.querySelector(formSel);
+        if (!form) return FormKit_Message['form-notExist'];
+        var data = form.serializeArray();
+        if (prefix) {
+            data = data.reduce((total, item) => {
+                total[item.name.substr(1, item.name.length)] = item.value;
+                return total;
+            }, {});
+        } else {
+            data = data.reduce((total, item) => {
+                total[item.name] = item.value;
+                return total;
+            }, {});
+        }
+        return data;
+    },
+    setForm({ formSel, prefix, params } = /* 依赖error */ErrorKit.emptyParameterException()) {
+        const form = document.querySelector(formSel);
+        if (!form) return FormKit_Message['form-notExist'];
+        let ele;
+        for (var key in params) {
+            if (prefix) ele = form.querySelector('[name=' + prefix + key + ']');
+            else ele = form.querySelector('[name=' + key + ']');
+            if (ele) ele.value = params[key];
+        }
+    }
+}
+var FormKit_verify = {
 
+}
+var FormKit_Message = {
+    ['form-notExist']: 'The form doesn\'t exist',
+}
+
+
+var FormKit = {
+    ...FormKit_Message,
+    ...FormKit_Verify,
+    ...FormKit_Operation,
+};
 //Http.js
 
 
@@ -54,18 +85,15 @@ var HttpKit_Uri = {
                 querystring += key + '=' + params[key];
                 querystring += '&';
             }
-            // 去除末尾&
             if (querystring.match(/&$/g)) querystring = querystring.slice(0, querystring.length - 1);
             return querystring;
         }
     },
     uri3query/* 合并uri以及query */(uri, ...params) {
         var querystring = this.query2string(...params);
-        // 连接
         uri.indexOf('?') == -1 ? uri += '?' + querystring : uri += querystring;
         return uri;
     },
-    // 如果空字符串查询指定为空的  推荐使用
     clear1void/* 清除无效的属性 undefined null 空字符串不在内 */(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -73,7 +101,6 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-    // 如果空字符串本是查询全部的 推荐使用  使用次数更多
     clear1allVoid/* 清除全部无效的属性 undefined null 空字符串包含在内 */(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -81,7 +108,6 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-    // 如果为0也需要清除  推荐使用这种 默认清除undefined以及null和空字符串
     clear1assignVoid/* 清除指定的属性 */(obj, assign = [], filter = 'clear1allVoid') {
         obj = this[filter](obj);
         for (let key in obj) {
@@ -99,9 +125,7 @@ var HttpKit = {
     ...HttpKit_Uri,
 }
 
-
 //Judge.js
-
 
 var JudgeKit_Judge = {
     void2empty/* 转换undefined以及null */(value) {
@@ -126,12 +150,9 @@ var JudgeKit = {
 }
 
 
-
 //Math.js
 
-
 //Object.js
-
 var ObjectKit = {
     deepCopy: function (obj) {
         var o;
@@ -146,37 +167,11 @@ var ObjectKit = {
                 o[i] = this.sCopy(obj[i]);
             }
         } else {
-            // 保持原型  不然会转成对象
             o = obj.valueOf();
         }
         return o;
     }    
 }
 
-// 判断简单类型复杂类型是否相等
-
-
-
-
-// 依赖方法
-// 拷贝  既能拷贝数组又能拷贝对象
-// Object.prototype.sCopy = function () {
-//     var o;
-//     if (Object.prototype.toString.call(this) === '[object Object]') {
-//         o = {};
-//         for (var key in this) {
-//             o[key] = this[key].sCopy();
-//         };
-//     } else if (Object.prototype.toString.call(this) === '[object Array]') {
-//         o = [];
-//         for (var [i, v] of this.entries()) {
-//             o[i] = this[i].sCopy();
-//         }
-//     } else {
-//         // 保持原型  不然会转成对象
-//         o = this.valueOf();
-//     }
-//     return o;
-// };
 
 

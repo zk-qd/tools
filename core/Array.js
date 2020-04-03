@@ -4,7 +4,7 @@ var ArrayKit = {
     ...ArrayKit_Context,
 }
 
-// 数组去重
+// array to heavy
 
 
 // 

@@ -1,5 +1,5 @@
 
-
+// universal judge
 var JudgeKit_Judge = {
     void2empty/* 转换undefined以及null */(value) {
         if (value == undefined) return '';
@@ -12,7 +12,7 @@ var JudgeKit_Judge = {
         else return value;
     },
     allVoid2bar/* 没有意义的字符串以及null undefined转成横条 */(value) {
-        var value = this.isAllUOrN(value)
+        var value = this.allVoid2empty(value)
         if (value === '') return '-';
         else return value;
     },
