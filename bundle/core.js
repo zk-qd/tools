@@ -1,6 +1,14 @@
 //Array.js
-var ArrayKit = {
 
+var ArrayKit_Context = {
+    dateSort/* 输入小时对象 然后进行排序 */(data) {
+        return Object.keys(data).sort().map(item => data[item]);
+    },
+}
+
+
+var ArrayKit = {
+    ...ArrayKit_Context,
 }
 //Date.js
 
@@ -57,7 +65,7 @@ var FormKit_Operation = {
         }
     }
 }
-var FormKit_verify = {
+var FormKit_Verify = {
 
 }
 var FormKit_Message = {

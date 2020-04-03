@@ -5,3 +5,5 @@ var ErrorKit = {
         throw TypeError('parameters are require');
     }
 }
+//RegExp.js
+
