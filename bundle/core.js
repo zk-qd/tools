@@ -74,7 +74,7 @@ var FormKit_Operation = {
     }
 }
 
-var FormKit_verify = {
+var FormKit_Verify = {
 
 }
 var FormKit_Message = {
