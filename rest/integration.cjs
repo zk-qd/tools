@@ -29,10 +29,10 @@ let coresList = fs.readdirSync(cores);
 let dependList = fs.readdirSync(depends);
 
 // 写入denpen和core文件集
-writeContent(dependList,depends,depend);
-writeContent(coresList,cores,main);
+writeContent(dependList, depends, depend);
+writeContent(coresList, cores, main);
 
-function writeContent(list,folderpath,writeInPath) {
+function writeContent(list, folderpath, writeInPath) {
     list.forEach(item => {
         // 排除json和lock文件
         if (item.match(/\.json$/g)) {
@@ -44,17 +44,17 @@ function writeContent(list,folderpath,writeInPath) {
             return false;
         };
         // 获取文件路径
-        let filepath = path.resolve(folderpath,item);
+        let filepath = path.resolve(folderpath, item);
         let query = fs.statSync(filepath);
         // 筛选
         if (query.isFile()) {
             let content = fs.readFileSync(filepath)
                 // 需要去除注释
-                .toString().replace(/\s*(\/\/)+.*/g, '');
+                .toString().replace(/(\s*(\/\/)+.*)|(\s*\/\*.*?\*\/\s*)/g, '')
             // console.log(chalk.red(content.toString()))
             // 写入
             fs.appendFileSync(writeInPath, '//' + item + '\r\n' + content + '\r\n');
-            console.log(chalk.blue('合并' + filepath + '到'),chalk.green(writeInPath));
+            console.log(chalk.blue('合并' + filepath + '到'), chalk.green(writeInPath));
         } else {
             console.log(chalk.blue('排除' + filepath))
         };

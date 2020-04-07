@@ -1,4 +1,4 @@
-var ObjectKit = {
+var ObjectKit = { 
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
