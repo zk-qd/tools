@@ -34,7 +34,7 @@ var FormKit_Operation = {
 }
 
 // verify 
-var FormKit_verify = {
+var FormKit_Verify = {
 
 }
 // message

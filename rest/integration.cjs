@@ -50,7 +50,7 @@ function writeContent(list, folderpath, writeInPath) {
         if (query.isFile()) {
             let content = fs.readFileSync(filepath)
                 // 需要去除注释
-                .toString().replace(/(\s*(\/\/)+.*)|(\s*\/\*.*?\*\/\s*)/g, '')
+                .toString().replace(/(s*[^'"]\/\/.*)|(\s*\/\*[\s\S]*?\*\/\s*)/gm, '');
             // console.log(chalk.red(content.toString()))
             // 写入
             fs.appendFileSync(writeInPath, '//' + item + '\r\n' + content + '\r\n');
