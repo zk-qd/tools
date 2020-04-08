@@ -10,9 +10,11 @@ var ArrayKit_Context = {
 var ArrayKit = {
     ...ArrayKit_Context,
 }
-
 
-
+
+
+
+
 //Date.js
 
 
@@ -37,7 +39,8 @@ var DateKit = {
         }
         return format;
     }
-}
+}
+
 //Form.js
 // operation
 var FormKit_Operation = {
@@ -73,10 +76,12 @@ var FormKit_Operation = {
         }
     }
 }
-
+
+
 var FormKit_Verify = {
 
-}
+}
+
 var FormKit_Message = {
     ['form-notExist']: 'The form doesn\'t exist',
 }
@@ -92,7 +97,8 @@ var FormKit = {
 
 var HttpKit_Judge = {
 
-}
+}
+
 var HttpKit_Uri = {
     query2string(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})
@@ -148,7 +154,8 @@ var HttpKit = {
 }
 
 //Judge.js
-
+
+
 var JudgeKit_Judge = {
     void2empty(value) {
         if (value == undefined) return '';
@@ -175,7 +182,7 @@ var JudgeKit = {
 //Math.js
 
 //Object.js
-var ObjectKit = { 
+var ObjectKit = {
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
@@ -195,7 +202,8 @@ var ObjectKit = {
         return o;
     }    
 }
-
+
+
 
 
 
