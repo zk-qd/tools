@@ -10,24 +10,28 @@ var ArrayKit_Context = {
 var ArrayKit = {
     ...ArrayKit_Context,
 }
+
 
-
-
-
-
+
 //Date.js
 
-
+var DateKit_Schema = {
+    parseSerialDate(val) {
+        return new Date(val.replace(/(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})/, '$<year>/$<month>/$<day>'));
+    }
+}
 var DateKit = {
+    ...DateKit_Schema,
     dateFormat:function (date, format) {
         if (!date) date = new Date();
+        else if(date.length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
        
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
-            { match: 'dd', val: date.getDay().toString().padStart(2, '0') },
+            { match: 'dd', val: date.getDate().toString().padStart(2, '0') },
             { match: 'hh', val: date.getHours().toString().padStart(2, '0') },
             { match: 'mm', val: date.getMinutes().toString().padStart(2, '0') },
             { match: 'ss', val: date.getSeconds().toString().padStart(2, '0') },
@@ -40,7 +44,7 @@ var DateKit = {
         return format;
     }
 }
-
+console.log(DateKit.dateFormat('20200401','yyyy-MM-dd hh:mm:ss'));
 //Form.js
 // operation
 var FormKit_Operation = {
@@ -76,12 +80,10 @@ var FormKit_Operation = {
         }
     }
 }
-
-
+
 var FormKit_Verify = {
 
-}
-
+}
 var FormKit_Message = {
     ['form-notExist']: 'The form doesn\'t exist',
 }
@@ -97,8 +99,7 @@ var FormKit = {
 
 var HttpKit_Judge = {
 
-}
-
+}
 var HttpKit_Uri = {
     query2string(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})
@@ -154,8 +155,7 @@ var HttpKit = {
 }
 
 //Judge.js
-
-
+
 var JudgeKit_Judge = {
     void2empty(value) {
         if (value == undefined) return '';
@@ -182,7 +182,7 @@ var JudgeKit = {
 //Math.js
 
 //Object.js
-var ObjectKit = {
+var ObjectKit = { 
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
@@ -202,8 +202,7 @@ var ObjectKit = {
         return o;
     }    
 }
-
-
+
 
 
 

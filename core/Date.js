@@ -15,7 +15,7 @@ var DateKit = {
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
-            { match: 'dd', val: date.getDay().toString().padStart(2, '0') },
+            { match: 'dd', val: date.getDate().toString().padStart(2, '0') },
             { match: 'hh', val: date.getHours().toString().padStart(2, '0') },
             { match: 'mm', val: date.getMinutes().toString().padStart(2, '0') },
             { match: 'ss', val: date.getSeconds().toString().padStart(2, '0') },
