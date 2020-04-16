@@ -7,6 +7,7 @@ var DateKit_Schema = {
 var DateKit = {
     ...DateKit_Schema,
     dateFormat:/* data format */ function (date, format) {
+
         if (!date) date = new Date();
         else if(date.length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
