@@ -8,7 +8,7 @@ var ArrayKit_Context = {
 }
 
 
-var ArrayKit = {
+window.ArrayKit = {
     ...ArrayKit_Context,
 }
 

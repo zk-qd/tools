@@ -1,15 +1,15 @@
-var ObjectKit = { 
+window.ObjectKit = { 
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
             o = {};
             for (var key in obj) {
-                o[key] = this.sCopy(obj[key]);
+                o[key] = this.deepCopy(obj[key]);
             };
         } else if (Object.prototype.toString.call(obj) === '[object Array]') {
             o = [];
             for (var [i, v] of obj.entries()) {
-                o[i] = this.sCopy(obj[i]);
+                o[i] = this.deepCopy(obj[i]);
             }
         } else {
             // 保持原型  不然会转成对象

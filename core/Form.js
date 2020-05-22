@@ -43,7 +43,7 @@ var FormKit_Message = {
 }
 
 
-var FormKit = {
+window.FormKit = {
     ...FormKit_Message,
     ...FormKit_Verify,
     ...FormKit_Operation,

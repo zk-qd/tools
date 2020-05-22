@@ -18,7 +18,7 @@ var JudgeKit_Judge = {
     },
 }
 
-var JudgeKit = {
+window.JudgeKit = {
     ...JudgeKit_Judge,
 }
 

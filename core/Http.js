@@ -53,7 +53,7 @@ var HttpKit_Uri = {
     }
 }
 
-var HttpKit = {
+window.HttpKit = {
     ...HttpKit_Judge,
     ...HttpKit_Uri,
 }

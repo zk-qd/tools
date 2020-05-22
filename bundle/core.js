@@ -9,12 +9,14 @@ var ArrayKit_Context = {
 }
 
 
-var ArrayKit = {
+window.ArrayKit = {
     ...ArrayKit_Context,
 }
-
 
-
+
+
+
+
 //Date.js
 
 var DateKit_Schema = {
@@ -22,7 +24,7 @@ var DateKit_Schema = {
         return new Date(val.replace(/(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})/, '$<year>/$<month>/$<day>'));
     }
 }
-var DateKit = {
+window.DateKit = {
     ...DateKit_Schema,
     dateFormat:function (date, format) {
 
@@ -48,6 +50,24 @@ var DateKit = {
     }
 }
 console.log(DateKit.dateFormat('20200401','yyyy-MM-dd hh:mm:ss'));
+//Dom.js
+window.DomKit = {
+   
+    copyText(dom) {
+        if (document.body.createTextRange) {
+            let range = document.body.createTextRange();
+            range.moveToElementText(dom);
+            range.select();
+        } else if (window.getSelection) {
+            let selection = window.getSelection();
+            let range = document.createRange();
+            range.selectNodeContents(dom);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+        document.execCommand("copy");
+    }
+}
 //Form.js
 // operation
 var FormKit_Operation = {
@@ -83,16 +103,18 @@ var FormKit_Operation = {
         }
     }
 }
-
+
+
 var FormKit_Verify = {
 
-}
+}
+
 var FormKit_Message = {
     ['form-notExist']: 'The form doesn\'t exist',
 }
 
 
-var FormKit = {
+window.FormKit = {
     ...FormKit_Message,
     ...FormKit_Verify,
     ...FormKit_Operation,
@@ -102,7 +124,8 @@ var FormKit = {
 
 var HttpKit_Judge = {
 
-}
+}
+
 var HttpKit_Uri = {
     query2string(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})
@@ -152,13 +175,14 @@ var HttpKit_Uri = {
     }
 }
 
-var HttpKit = {
+window.HttpKit = {
     ...HttpKit_Judge,
     ...HttpKit_Uri,
 }
 
 //Judge.js
-
+
+
 var JudgeKit_Judge = {
     void2empty(value) {
         if (value == undefined) return '';
@@ -177,7 +201,7 @@ var JudgeKit_Judge = {
     },
 }
 
-var JudgeKit = {
+window.JudgeKit = {
     ...JudgeKit_Judge,
 }
 
@@ -185,18 +209,18 @@ var JudgeKit = {
 //Math.js
 
 //Object.js
-var ObjectKit = { 
+window.ObjectKit = { 
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
             o = {};
             for (var key in obj) {
-                o[key] = this.sCopy(obj[key]);
+                o[key] = this.deepCopy(obj[key]);
             };
         } else if (Object.prototype.toString.call(obj) === '[object Array]') {
             o = [];
             for (var [i, v] of obj.entries()) {
-                o[i] = this.sCopy(obj[i]);
+                o[i] = this.deepCopy(obj[i]);
             }
         } else {
            
@@ -205,7 +229,8 @@ var ObjectKit = {
         return o;
     }    
 }
-
+
+
 
 
 
