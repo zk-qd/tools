@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 window.ObjectKit = {
+=======
+var ObjectKit = { 
+>>>>>>> 8f5751d6a52ab8c386690a8adb74e123b2212926
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {

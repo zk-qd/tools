@@ -4,7 +4,11 @@ var DateKit_Schema = {
         return new Date(val.replace(/(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})/, '$<year>/$<month>/$<day>'));
     }
 }
+<<<<<<< HEAD
 window.DateKit = {
+=======
+var DateKit = {
+>>>>>>> 8f5751d6a52ab8c386690a8adb74e123b2212926
     ...DateKit_Schema,
     dateFormat:/* data format */ function (date, format) {
 
