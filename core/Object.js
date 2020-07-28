@@ -24,10 +24,10 @@ window.ObjectKit = {
     debounce: function (handle, delay = 400) /* 防抖动 */ {
         let timer = null;
         return async function (...args) {
-            return new Promise((reject) => {
+            return new Promise((resolve) => {
                 if (timer) clearTimeout(timer)
                 timer = setTimeout(() => {
-                    reject(handle.apply(this, args));
+                    resolve(handle.apply(this, args));
                     timer = null
                 }, delay)
             })
