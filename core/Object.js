@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 window.ObjectKit = {
-=======
-var ObjectKit = { 
->>>>>>> 8f5751d6a52ab8c386690a8adb74e123b2212926
     deepCopy: function (obj) {
         var o;
         if (Object.prototype.toString.call(obj) === '[object Object]') {
@@ -25,17 +21,19 @@ var ObjectKit = {
      * @param {Function} handle
      * @param {Number} delay
      */
-    debounce: function(handle, delay = 400) /* 防抖动 */ {
+    debounce: function (handle, delay = 400) /* 防抖动 */ {
         let timer = null;
-        return function (...args) {
-            if (timer) clearTimeout(timer)
-            timer = setTimeout(() => {
-                handle.apply(this, args);
-                timer = null
-            }, delay)
+        return async function (...args) {
+            return new Promise((reject) => {
+                if (timer) clearTimeout(timer)
+                timer = setTimeout(() => {
+                    reject(handle.apply(this, args));
+                    timer = null
+                }, delay)
+            })
         }
     },
-    throttle: function(handle, delay = 500) /* 节流阀 */ {
+    throttle: function (handle, delay = 500) /* 节流阀 */ {
         let timer = null,
             // 初始化一个开始时间
             startTime = Date.parse(new Date()),
