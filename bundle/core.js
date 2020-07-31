@@ -311,14 +311,22 @@ window.ObjectKit = {
         }
         return o;
     }, debounce: function (handle, delay = 400) {
-        let timer = null;
+        let timer = null,
+
+            cancel = null;
         return async function (...args) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 if (timer) clearTimeout(timer)
+                if (cancel) cancel();
                 timer = setTimeout(() => {
                     resolve(handle.apply(this, args));
                     timer = null
                 }, delay)
+                cancel = () => {
+                    reject()
+                }
+            }).catch((err) => {
+                console.log("请勿频繁操作")
             })
         }
     },
@@ -344,7 +352,6 @@ window.ObjectKit = {
         }
     }
 }
-
 
 
 

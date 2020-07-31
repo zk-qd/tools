@@ -20,16 +20,26 @@ window.ObjectKit = {
     /**
      * @param {Function} handle
      * @param {Number} delay
+     * @returns {Promise}
+     * 使用promise可能有点问题,已优化
      */
     debounce: function (handle, delay = 400) /* 防抖动 */ {
-        let timer = null;
+        let timer = null,
+            // 取消promise
+            cancel = null;
         return async function (...args) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 if (timer) clearTimeout(timer)
+                if (cancel) cancel();
                 timer = setTimeout(() => {
                     resolve(handle.apply(this, args));
                     timer = null
                 }, delay)
+                cancel = () => {
+                    reject()
+                }
+            }).catch((err) => {
+                console.log("请勿频繁操作")
             })
         }
     },
