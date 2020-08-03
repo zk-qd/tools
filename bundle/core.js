@@ -330,6 +330,35 @@ window.ObjectKit = {
             })
         }
     },
+    debounce(handler, delay, immediate) {
+        let timer = null,
+            cancle;
+
+        return function (...args) {
+            return new Promise((resolve, reject) => {
+                let content = this;
+                if (timer) clearTimeout(timer);
+                if (cancle) clearTimeout(timer);
+
+                if (immediate) {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                    immediate = false;
+                }
+                setTimeout(() => {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                }, delay);
+                cancle = () => {
+
+                    reject("请勿频繁操作");
+                };
+            });
+        }
+    },
+
     throttle: function (handle, delay = 500) {
         let timer = null,
 
@@ -352,6 +381,7 @@ window.ObjectKit = {
         }
     }
 }
+
 
 
 

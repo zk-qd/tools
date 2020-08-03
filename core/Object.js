@@ -43,6 +43,35 @@ window.ObjectKit = {
             })
         }
     },
+    debounce(handler, delay, immediate) {
+        let timer = null,
+            cancle;
+        // 这里不要用箭头函数
+        return function (...args) {
+            return new Promise((resolve, reject) => {
+                let content = this;
+                if (timer) clearTimeout(timer);
+                if (cancle) clearTimeout(timer);
+                // 如果immediate参数为true 那么第一次是立即请求，后面立即改为延迟请求
+                if (immediate) {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                    immediate = false;
+                }
+                setTimeout(() => {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                }, delay);
+                cancle = () => {
+                    // 只有请求到了结果才算成功，再次之前任何下一次请求，都会取消上次请求
+                    reject("请勿频繁操作");
+                };
+            });
+        }
+    },
+
     throttle: function (handle, delay = 500) /* 节流阀 */ {
         let timer = null,
             // 初始化一个开始时间
