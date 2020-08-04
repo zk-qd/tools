@@ -9,7 +9,7 @@ window.DateKit = {
     dateFormat:/* data format */ function (date, format) {
 
         if (!date) date = new Date();
-        else if(date.length == 8) date = this.parseSerialDate(date);
+        else if(date.toString().length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
         // 注意月份是 MM 分钟是mm
