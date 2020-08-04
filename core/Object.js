@@ -20,18 +20,59 @@ window.ObjectKit = {
     /**
      * @param {Function} handle
      * @param {Number} delay
+     * @returns {Promise}
+     * 使用promise可能有点问题,已优化
      */
-    debounce: function(handle, delay = 400) /* 防抖动 */ {
-        let timer = null;
-        return function (...args) {
-            if (timer) clearTimeout(timer)
-            timer = setTimeout(() => {
-                handle.apply(this, args);
-                timer = null
-            }, delay)
+    debounce: function (handle, delay = 400) /* 防抖动 */ {
+        let timer = null,
+            // 取消promise
+            cancel = null;
+        return async function (...args) {
+            return new Promise((resolve, reject) => {
+                if (timer) clearTimeout(timer)
+                if (cancel) cancel();
+                timer = setTimeout(() => {
+                    resolve(handle.apply(this, args));
+                    timer = null
+                }, delay)
+                cancel = () => {
+                    reject()
+                }
+            }).catch((err) => {
+                console.log("请勿频繁操作")
+            })
         }
     },
-    throttle: function(handle, delay = 500) /* 节流阀 */ {
+    debounce(handler, delay, immediate) {
+        let timer = null,
+            cancle;
+        // 这里不要用箭头函数
+        return function (...args) {
+            return new Promise((resolve, reject) => {
+                let content = this;
+                if (timer) clearTimeout(timer);
+                if (cancle) clearTimeout(timer);
+                // 如果immediate参数为true 那么第一次是立即请求，后面立即改为延迟请求
+                if (immediate) {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                    immediate = false;
+                }
+                setTimeout(() => {
+                    handler.apply(content, args).then((res) => {
+                        resolve(res);
+                    });
+                }, delay);
+                cancle = () => {
+                    // 只有请求到了结果才算成功，再次之前任何下一次请求，都会取消上次请求
+                    reject("请勿频繁操作");
+                };
+            });
+        }
+    },
+
+    throttle: function (handle, delay = 500) /* 节流阀 */ {
         let timer = null,
             // 初始化一个开始时间
             startTime = Date.parse(new Date()),
