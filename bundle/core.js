@@ -1,8 +1,8 @@
 //Array.js
 
 var ArrayKit_Context = {
-   
-   
+
+
     dateSort(data) {
         return Object.keys(data).sort().map(item => data[item]);
     },
@@ -12,9 +12,11 @@ var ArrayKit_Context = {
 window.ArrayKit = {
     ...ArrayKit_Context,
 }
-
 
-
+
+
+
+
 //Date.js
 
 var DateKit_Schema = {
@@ -24,13 +26,13 @@ var DateKit_Schema = {
 }
 window.DateKit = {
     ...DateKit_Schema,
-    dateFormat:function (date, format) {
+    dateFormat: function (date, format) {
 
         if (!date) date = new Date();
-        else if(date.toString().length == 8) date = this.parseSerialDate(date);
+        else if (date.toString().length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
-       
+
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
@@ -47,10 +49,10 @@ window.DateKit = {
         return format;
     }
 }
-console.log(DateKit.dateFormat('20200401','yyyy-MM-dd hh:mm:ss'));
+console.log(DateKit.dateFormat('20200401', 'yyyy-MM-dd hh:mm:ss'));
 //Dom.js
 window.DomKit = {
-   
+
     copyText(dom) {
         return new Promise((resolve, reject) => {
             try {
@@ -76,8 +78,8 @@ window.DomKit = {
 //Form.js
 // operation
 var FormKit_Operation = {
-   
-    getForm({ formSel, prefix } =ErrorKit.emptyParameterException()) {
+
+    getForm({ formSel, prefix } = ErrorKit.emptyParameterException()) {
         var form = document.querySelector(formSel);
         if (!form) return FormKit_Message['form-notExist'];
         var data = form.serializeArray();
@@ -94,12 +96,12 @@ var FormKit_Operation = {
         }
         return data;
     },
-   
-    setForm({ formSel, prefix, params } =ErrorKit.emptyParameterException()) {
-       
+
+    setForm({ formSel, prefix, params } = ErrorKit.emptyParameterException()) {
+
         const form = document.querySelector(formSel);
         if (!form) return FormKit_Message['form-notExist'];
-       
+
         let ele;
         for (var key in params) {
             if (prefix) ele = form.querySelector('[name=' + prefix + key + ']');
@@ -108,10 +110,12 @@ var FormKit_Operation = {
         }
     }
 }
-
+
+
 var FormKit_Verify = {
 
-}
+}
+
 var FormKit_Message = {
     ['form-notExist']: 'The form doesn\'t exist',
 }
@@ -127,7 +131,8 @@ window.FormKit = {
 
 var HttpKit_Judge = {
 
-}
+}
+
 var HttpKit_Uri = {
     query2string(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})
@@ -137,18 +142,18 @@ var HttpKit_Uri = {
                 querystring += key + '=' + params[key];
                 querystring += '&';
             }
-           
+
             if (querystring.match(/&$/g)) querystring = querystring.slice(0, querystring.length - 1);
             return querystring;
         }
     },
     uri3query(uri, ...params) {
         var querystring = this.query2string(...params);
-       
+
         uri.indexOf('?') == -1 ? uri += '?' + querystring : uri += querystring;
         return uri;
     },
-   
+
     clear1void(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -156,7 +161,7 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-   
+
     clear1allVoid(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -164,7 +169,7 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-   
+
     clear1assignVoid(obj, assign = [], filter = 'clear1allVoid') {
         obj = this[filter](obj);
         for (let key in obj) {
@@ -183,7 +188,8 @@ window.HttpKit = {
 }
 
 //Judge.js
-
+
+
 var JudgeKit_Judge = {
     void2empty(value) {
         if (value == undefined) return '';
@@ -213,7 +219,7 @@ window.JudgeKit = {
 
 
 var MathKit_Compute = {
-   
+
     add(arg1, arg2) {
         let r1, r2, m;
         try {
@@ -229,7 +235,7 @@ var MathKit_Compute = {
         m = Math.pow(10, Math.max(r1, r2));
         return (arg1 * m + arg2 * m) / m;
     },
-   
+
     subtract(arg1, arg2) {
         let r1, r2, m, n;
         try {
@@ -243,11 +249,11 @@ var MathKit_Compute = {
             r2 = 0;
         }
         m = Math.pow(10, Math.max(r1, r2));
-       
+
         n = r1 >= r2 ? r1 : r2;
         return ((arg1 * m - arg2 * m) / m).toFixed(2);
     },
-   
+
     multiply(arg1, arg2) {
         let m = 0,
             s1 = arg1.toString(),
@@ -263,7 +269,7 @@ var MathKit_Compute = {
             Math.pow(10, m)
         );
     },
-   
+
     divide(arg1, arg2) {
         let t1 = 0,
             t2 = 0,
@@ -300,13 +306,13 @@ window.ObjectKit = {
                 o[i] = this.deepCopy(obj[i]);
             }
         } else {
-           
+
             o = obj.valueOf();
         }
         return o;
-    },debounce: function (handle, delay = 400){
+    }, debounce: function (handle, delay = 400) {
         let timer = null,
-           
+
             cancel = null;
         return async function (...args) {
             return new Promise((resolve, reject) => {
@@ -327,13 +333,13 @@ window.ObjectKit = {
     debounce(handler, delay, immediate) {
         let timer = null,
             cancle;
-       
+
         return function (...args) {
             return new Promise((resolve, reject) => {
                 let content = this;
                 if (timer) clearTimeout(timer);
                 if (cancle) clearTimeout(timer);
-               
+
                 if (immediate) {
                     handler.apply(content, args).then((res) => {
                         resolve(res);
@@ -346,23 +352,23 @@ window.ObjectKit = {
                     });
                 }, delay);
                 cancle = () => {
-                   
+
                     reject("请勿频繁操作");
                 };
             });
         }
     },
 
-    throttle: function (handle, delay = 500){
+    throttle: function (handle, delay = 500) {
         let timer = null,
-           
+
             startTime = Date.parse(new Date()),
-           
+
             curTime,
-           
+
             remaining,
             context;
-        return function (...args){
+        return function (...args) {
             curTime = Date.parse(new Date());
             remaining = delay - (curTime - startTime);
             context = this;
@@ -370,13 +376,8 @@ window.ObjectKit = {
             if (remaining <= 0) {
                 handle.apply(context, args);
                 startTime = Date.parse(new Date());
-            } else 
+            } else
                 timer = setTimeout(handle, remaining);
-            }
         }
     }
 }
-
-
-
-
