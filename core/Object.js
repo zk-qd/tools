@@ -51,23 +51,30 @@ window.ObjectKit = {
             return new Promise((resolve, reject) => {
                 let content = this;
                 if (timer) clearTimeout(timer);
-                if (cancle) clearTimeout(timer);
+                if (cancle) cancle(timer);
                 // 如果immediate参数为true 那么第一次是立即请求，后面立即改为延迟请求
                 if (immediate) {
-                    handler.apply(content, args).then((res) => {
-                        resolve(res);
-                    });
+                    execute();
                     immediate = false;
                 }
                 setTimeout(() => {
-                    handler.apply(content, args).then((res) => {
-                        resolve(res);
-                    });
+                    execute();
                 }, delay);
                 cancle = () => {
                     // 只有请求到了结果才算成功，再次之前任何下一次请求，都会取消上次请求
                     reject("请勿频繁操作");
                 };
+                function execute() {
+                    // 判断是否为promise函数
+                    if (Promise[Symbol.hasInstance](handler)) {
+                        handler.apply(content, args).then((res) => {
+                            resolve(res);
+                        });
+                    } else {
+                        // 如果不是promise函数
+                        resolve(handler.apply(content, args))
+                    }
+                }
             });
         }
     },

@@ -338,23 +338,30 @@ window.ObjectKit = {
             return new Promise((resolve, reject) => {
                 let content = this;
                 if (timer) clearTimeout(timer);
-                if (cancle) clearTimeout(timer);
+                if (cancle) cancle(timer);
 
                 if (immediate) {
-                    handler.apply(content, args).then((res) => {
-                        resolve(res);
-                    });
+                    execute();
                     immediate = false;
                 }
                 setTimeout(() => {
-                    handler.apply(content, args).then((res) => {
-                        resolve(res);
-                    });
+                    execute();
                 }, delay);
                 cancle = () => {
 
                     reject("请勿频繁操作");
                 };
+                function execute() {
+
+                    if (Promise[Symbol.hasInstance](handler)) {
+                        handler.apply(content, args).then((res) => {
+                            resolve(res);
+                        });
+                    } else {
+
+                        resolve(handler.apply(content, args))
+                    }
+                }
             });
         }
     },
@@ -381,3 +388,8 @@ window.ObjectKit = {
         }
     }
 }
+
+
+
+
+
