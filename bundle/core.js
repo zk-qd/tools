@@ -75,6 +75,15 @@ window.DomKit = {
         })
     }
 }
+//Encrypt.js
+
+
+window.EncryptKit = {
+    idNum(val) {
+        if (!val) return val;
+        return val.toString().replace(/(\d{3})\d{11}(\d{4})/, "$1" + "*".repeat(11) + "$2");
+    }
+}
 //Form.js
 // operation
 var FormKit_Operation = {
