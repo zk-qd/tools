@@ -81,7 +81,7 @@ window.DomKit = {
 window.EncryptKit = {
     idNum(val) {
         if (!val) return val;
-        return val.toString().replace(/(\d{3})\d{11}(\d{4})/, "$1" + "*".repeat(11) + "$2");
+        return val.toString().replace(/(\d{3})\d{11}(\d{4}|\d{3}[A-Z]{1})/, "$1" + "*".repeat(11) + "$2");
     }
 }
 //Form.js
