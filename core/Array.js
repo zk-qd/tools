@@ -11,8 +11,3 @@ var ArrayKit_Context = {
 window.ArrayKit = {
     ...ArrayKit_Context,
 }
-
-// array to heavy
-
-
-// 

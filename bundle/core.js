@@ -19,12 +19,12 @@ window.ArrayKit = {
 
 //Date.js
 
-var DateKit_Schema = {
+const DateKit_Schema = {
     parseSerialDate(val) {
         return new Date(val.replace(/(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})/, '$<year>/$<month>/$<day>'));
     }
 }
-window.DateKit = {
+const DateKit = {
     ...DateKit_Schema,
     dateFormat: function (date, format) {
 
@@ -47,9 +47,22 @@ window.DateKit = {
             format = format.replace(reg, item.val);
         }
         return format;
+    }, getDates(date) {
+        if (date) {
+            date = new Date(date);
+        } else {
+
+            date = new Date();
+        }
+        let year = date.getFullYear(),
+            month = date.getMonth() + 1;
+        return new Date(year, month, 0).getDate();
     }
 }
+window.DateKit = DateKit;
+
 console.log(DateKit.dateFormat('20200401', 'yyyy-MM-dd hh:mm:ss'));
+console.log(DateKit.getDates())
 //Dom.js
 window.DomKit = {
 
@@ -397,8 +410,3 @@ window.ObjectKit = {
         }
     }
 }
-
-
-
-
-
