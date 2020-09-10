@@ -40,26 +40,22 @@ const DateKit = {
             date = new Date();
         }
         let year = date.getFullYear(),
-            month = date.getMonth() + 1;
-        return new Date(year, month, 0).getDate();
+            month = date.getMonth();
+        return new Date(year, month + 1, 0).getDate();
     },
     prevMonth: /* 获取上个月的Date对象 */function (date) {
         if (date) date = new Date(date);
         date = new Date();
-        let month = date.getMonth() - 1,
+        let month = date.getMonth(),
             year = date.getFullYear();
-        // 上个月就是
-        if (month == -1) month = 12;
-        return new Date(year, month, 1);
+        return new Date(year, month - 1, 1);
     },
     nextMonth: /* 获取下一个月的Date对象 */ function (date) {
         if (date) date = new Date(date);
         date = new Date();
-        let month = date.getMonth() + 1,
+        let month = date.getMonth(),
             year = date.getFullYear();
-        // 上个月就是
-        if (month == 12) month = 1;
-        return new Date(year, month, 1);
+        return new Date(year, month + 1, 1);
     },
     timeAndDate: /* 通过时间和日期组合成date对象 */ function (time, date) {
         if (time) time = new Date(time);
@@ -88,13 +84,13 @@ const DateKit = {
         switch (type) {
             case 'year':
                 return {
-                    begin: new Date(year, 1, 1),
-                    end: new Date(year, 12),
+                    begin: new Date(year, 0, 1),
+                    end: new Date(year, 11),
                 };
             case 'month':
                 return {
                     begin: new Date(year, month),
-                    end: new Date(year, month, 0),
+                    end: new Date(year, month + 1, 0),
                 };
             case 'day':
                 return {

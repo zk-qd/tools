@@ -51,26 +51,22 @@ const DateKit = {
             date = new Date();
         }
         let year = date.getFullYear(),
-            month = date.getMonth() + 1;
-        return new Date(year, month, 0).getDate();
+            month = date.getMonth();
+        return new Date(year, month + 1, 0).getDate();
     },
     prevMonth: function (date) {
         if (date) date = new Date(date);
         date = new Date();
-        let month = date.getMonth() - 1,
+        let month = date.getMonth(),
             year = date.getFullYear();
-
-        if (month == -1) month = 12;
-        return new Date(year, month, 1);
+        return new Date(year, month - 1, 1);
     },
     nextMonth: function (date) {
         if (date) date = new Date(date);
         date = new Date();
-        let month = date.getMonth() + 1,
+        let month = date.getMonth(),
             year = date.getFullYear();
-
-        if (month == 12) month = 1;
-        return new Date(year, month, 1);
+        return new Date(year, month + 1, 1);
     },
     timeAndDate: function (time, date) {
         if (time) time = new Date(time);
@@ -91,13 +87,13 @@ const DateKit = {
         switch (type) {
             case 'year':
                 return {
-                    begin: new Date(year, 1, 1),
-                    end: new Date(year, 12),
+                    begin: new Date(year, 0, 1),
+                    end: new Date(year, 11),
                 };
             case 'month':
                 return {
                     begin: new Date(year, month),
-                    end: new Date(year, month, 0),
+                    end: new Date(year, month + 1, 0),
                 };
             case 'day':
                 return {
