@@ -43,7 +43,7 @@ window.ObjectKit = {
             })
         }
     },
-    debounce(handler, delay, immediate) {
+    debounce(handler, delay = 400, immediate = true) {
         let timer = null,
             cancle;
         // 这里不要用箭头函数
@@ -56,23 +56,25 @@ window.ObjectKit = {
                 if (immediate) {
                     execute();
                     immediate = false;
+                } else {
+                    timer = setTimeout(() => {
+                        execute();
+                    }, delay);
                 }
-                setTimeout(() => {
-                    execute();
-                }, delay);
                 cancle = () => {
                     // 只有请求到了结果才算成功，再次之前任何下一次请求，都会取消上次请求
                     reject("请勿频繁操作");
                 };
                 function execute() {
-                    // 判断是否为promise函数
-                    if (Promise[Symbol.hasInstance](handler)) {
-                        handler.apply(content, args).then((res) => {
+                    // 判断返回是否为promise函数
+                    let returned = handler.apply(content, args);
+                    if (Promise[Symbol.hasInstance](returned)) {
+                        returned.then((res) => {
                             resolve(res);
                         });
                     } else {
                         // 如果不是promise函数
-                        resolve(handler.apply(content, args))
+                        resolve(returned)
                     }
                 }
             });
@@ -103,6 +105,5 @@ window.ObjectKit = {
     }
 }
 
-// 判断简单类型复杂类型是否相等
 
 

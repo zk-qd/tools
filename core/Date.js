@@ -32,7 +32,7 @@ const DateKit = {
      * @param {Any} date 传入时间 格式可以被new Date转化就行了
      * @returns {Number} 返回的是一个月的天数
      */
-    getDates /* 获取一个月的天数 */(date) {
+    dayOfMonth:  /* 获取一个月的天数 */function (date) {
         if (date) {
             date = new Date(date);
         } else {
@@ -42,9 +42,80 @@ const DateKit = {
         let year = date.getFullYear(),
             month = date.getMonth() + 1;
         return new Date(year, month, 0).getDate();
+    },
+    prevMonth: /* 获取上个月的Date对象 */function (date) {
+        if (date) date = new Date(date);
+        date = new Date();
+        let month = date.getMonth() - 1,
+            year = date.getFullYear();
+        // 上个月就是
+        if (month == -1) month = 12;
+        return new Date(year, month, 1);
+    },
+    nextMonth: /* 获取下一个月的Date对象 */ function (date) {
+        if (date) date = new Date(date);
+        date = new Date();
+        let month = date.getMonth() + 1,
+            year = date.getFullYear();
+        // 上个月就是
+        if (month == 12) month = 1;
+        return new Date(year, month, 1);
+    },
+    timeAndDate: /* 通过时间和日期组合成date对象 */ function (time, date) {
+        if (time) time = new Date(time);
+        else time = new Date();
+        if (date) date = new Date(date);
+        else date = new Date();
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
+
+    },
+    /**
+     * *根据某分,某小时，某日，某月，某年获取时间段 
+     * @param {String} type minute,hour,day，month，year
+     * @param {Any} date 
+     * @returns {Object} {begin: new Date,end: new Date} 
+     * todo 返回的是两个时间段
+     * */
+    intervalOfDate: function (type, date) {
+        if (date) date = new Date(date);
+        else date = new Date();
+        let year = date.getFullYear(),
+            month = date.getMonth(),
+            day = date.getDate(),
+            hour = date.getHours(),
+            minute = date.getMinutes(),
+            second = date.getSeconds();
+        switch (type) {
+            case 'year':
+                return {
+                    begin: new Date(year, 1, 1),
+                    end: new Date(year, 12),
+                };
+            case 'month':
+                return {
+                    begin: new Date(year, month),
+                    end: new Date(year, month, 0),
+                };
+            case 'day':
+                return {
+                    begin: new Date(year, month, day, 0, 0, 0),
+                    end: new Date(year, month, day, 23, 59, 59),
+                };
+            case 'hour':
+                return {
+                    begin: new Date(year, month, day, hour, 0, 0),
+                    end: new Date(year, month, day, hour, 59, 59),
+                };
+            case 'minute':
+                return {
+                    begin: new Date(year, month, day, hour, minute, 0),
+                    end: new Date(year, month, day, hour, minute, 59),
+                };
+        }
     }
 }
 window.DateKit = DateKit;
 // 测试
 console.log(DateKit.dateFormat('20200401', 'yyyy-MM-dd hh:mm:ss'));
-console.log(DateKit.getDates())
+console.log(DateKit.dayOfMonth())
+console.log(DateKit.prevMonth())

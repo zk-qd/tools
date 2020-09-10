@@ -13,10 +13,6 @@ window.ArrayKit = {
     ...ArrayKit_Context,
 }
 
-
-
-
-
 //Date.js
 
 const DateKit_Schema = {
@@ -47,7 +43,7 @@ const DateKit = {
             format = format.replace(reg, item.val);
         }
         return format;
-    }, getDates(date) {
+    }, dayOfMonth: function (date) {
         if (date) {
             date = new Date(date);
         } else {
@@ -57,12 +53,75 @@ const DateKit = {
         let year = date.getFullYear(),
             month = date.getMonth() + 1;
         return new Date(year, month, 0).getDate();
+    },
+    prevMonth: function (date) {
+        if (date) date = new Date(date);
+        date = new Date();
+        let month = date.getMonth() - 1,
+            year = date.getFullYear();
+
+        if (month == -1) month = 12;
+        return new Date(year, month, 1);
+    },
+    nextMonth: function (date) {
+        if (date) date = new Date(date);
+        date = new Date();
+        let month = date.getMonth() + 1,
+            year = date.getFullYear();
+
+        if (month == 12) month = 1;
+        return new Date(year, month, 1);
+    },
+    timeAndDate: function (time, date) {
+        if (time) time = new Date(time);
+        else time = new Date();
+        if (date) date = new Date(date);
+        else date = new Date();
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
+
+    }, intervalOfDate: function (type, date) {
+        if (date) date = new Date(date);
+        else date = new Date();
+        let year = date.getFullYear(),
+            month = date.getMonth(),
+            day = date.getDate(),
+            hour = date.getHours(),
+            minute = date.getMinutes(),
+            second = date.getSeconds();
+        switch (type) {
+            case 'year':
+                return {
+                    begin: new Date(year, 1, 1),
+                    end: new Date(year, 12),
+                };
+            case 'month':
+                return {
+                    begin: new Date(year, month),
+                    end: new Date(year, month, 0),
+                };
+            case 'day':
+                return {
+                    begin: new Date(year, month, day, 0, 0, 0),
+                    end: new Date(year, month, day, 23, 59, 59),
+                };
+            case 'hour':
+                return {
+                    begin: new Date(year, month, day, hour, 0, 0),
+                    end: new Date(year, month, day, hour, 59, 59),
+                };
+            case 'minute':
+                return {
+                    begin: new Date(year, month, day, hour, minute, 0),
+                    end: new Date(year, month, day, hour, minute, 59),
+                };
+        }
     }
 }
 window.DateKit = DateKit;
 
 console.log(DateKit.dateFormat('20200401', 'yyyy-MM-dd hh:mm:ss'));
-console.log(DateKit.getDates())
+console.log(DateKit.dayOfMonth())
+console.log(DateKit.prevMonth())
 //Dom.js
 window.DomKit = {
 
@@ -352,7 +411,7 @@ window.ObjectKit = {
             })
         }
     },
-    debounce(handler, delay, immediate) {
+    debounce(handler, delay = 400, immediate = true) {
         let timer = null,
             cancle;
 
@@ -365,23 +424,25 @@ window.ObjectKit = {
                 if (immediate) {
                     execute();
                     immediate = false;
+                } else {
+                    timer = setTimeout(() => {
+                        execute();
+                    }, delay);
                 }
-                setTimeout(() => {
-                    execute();
-                }, delay);
                 cancle = () => {
 
                     reject("请勿频繁操作");
                 };
                 function execute() {
 
-                    if (Promise[Symbol.hasInstance](handler)) {
-                        handler.apply(content, args).then((res) => {
+                    let returned = handler.apply(content, args);
+                    if (Promise[Symbol.hasInstance](returned)) {
+                        returned.then((res) => {
                             resolve(res);
                         });
                     } else {
 
-                        resolve(handler.apply(content, args))
+                        resolve(returned)
                     }
                 }
             });
@@ -410,3 +471,7 @@ window.ObjectKit = {
         }
     }
 }
+
+
+
+
