@@ -102,6 +102,178 @@ window.ObjectKit = {
                 timer = setTimeout(handle, remaining);
             }
         }
+    },
+    /**
+     * *观察者 
+     * todo observer = new Observer();
+     * ? observer.on(type,fn) 消息订阅
+     * @param {String} 事件类型
+     * @param {Function} 处理函数
+     * !一个type可以绑定多个处理函数
+     * ? observer.emit(type,args) 消息发布
+     * @param {String} 事件类型
+     * @param {args} 参数
+     * !触发type绑定的所有函数
+     * ? observer.off(type,fn) 注销订阅
+     * @param {String} 事件类型
+     * @param {Function} 处理函数
+     * ! 注销一个类型的其中一个函数
+    */
+    Observer: function () {
+        const list = {};
+        this.on = function (type, fn) {
+            !list[type] && (list[type] = new Set());
+            list[type].add(fn)
+        }
+        this.emit = function (type, args) {
+            let event = { type: type, params: args }
+            list[type] && list[type].forEach(fn => fn.call(undefined, event));
+        }
+        this.off = function (type, fn) {
+            list[type] && list[type].delete(fn);
+        }
+    },
+    /**
+     * *状态管理
+     * @param {Object} states 状态方法集合
+     * @return {Object} 接口对象
+     * 执行状态返回this，不需要返回其他数据，因为状态之间是没有关系的\
+     * usage:
+     * stateModel.change('fn1','fn2').run()
+     *  */
+    StateModel: function (states) {
+        // 安全模式
+        if (new.target !== ObjectKit.StateModel) { return new ObjectKit.StateModel(states) }
+        let currentState = {};
+        // 控制类
+        let constrol = {
+            change(...args) {
+                let i = 0, len = args.length;
+                // 重置当前状态
+                currentState = {};
+                // 添加新的状态
+                for (; i < len; i++) {
+                    currentState[args[i]] = true;
+                }
+                return this;
+            },
+            run() {
+                for (let key in currentState) {
+                    states[key] && states[key]();
+                }
+                return this;
+            }
+
+        }
+        return constrol;
+
+    },
+
+    /**
+     * 命令模式
+     * @param {Object} command 命令对象
+     * @returns {Object} {execute: 执行命令方法} 
+     * 命令和状态不一样，可能需要返回值 
+     * usage:
+     * commandModel.execute([{cmd: 'fn1',params: []])
+     * */
+    CommandModel: function (command = {}) {
+        if (new.target !== ObjectKit.CommandModel) return new ObjectKit.CommandModel(command);
+        return {
+            /** 
+             * *执行命令方法 
+             * execute(args)
+             * @param {Object or Array} args 如果是对象那么直接执行，如果是数组，那么递归执行
+             * @return {Any} 返回方法的返回值
+             * ! args的格式: [{cmd: '命令名称',params: ['参数列表']}]
+             * 
+             * */
+            execute(args) {
+                // 判断是否数组
+                if (Object.prototype.toString.call(args) === '[object Array]') {
+                    args.forEach(this.execute)
+                }
+                let cmd = args['cmd'], // 命令
+                    params = args['params'] || [];// 参数
+                return command && command[cmd] && command[cmd](...params);
+            }
+        }
+    },
+    /** 
+     * *享元模式
+     * @param  {Object} logic 共享逻辑
+     * @returns {Object} 返回访问接口
+     * 既可以初始化，又可以动态添加
+     * flyweight.add({fn1: function})
+     * flyweight.call([{share: 'fn1',params: [{}]}])
+     *  */
+    Flyweight: function (logic = {}) {
+        if (new.target !== ObjectKit.Flyweight) return new ObjectKit.Flyweight(logic);
+        return {
+            /**
+             * *执行逻辑的方法
+             * call(args)
+             * @param {Object or Array} args 如果是对象那么直接执行，如果是数组，那么递归执行
+             * @return {Any} 返回方法的返回值
+             * ! args的格式: [{share: '共享方法名称',params: ['参数列表']}]
+             *
+             * */
+            call(args) {
+                // 判断是否数组
+                if (Object.prototype.toString.call(args) === '[object Array]') {
+                    args.forEach(this.call)
+                }
+                let share = args['share'], // 共享方法名
+                    params = args['params'] || [];// 参数
+                return logic && logic[share] && logic[share](...params);
+            },
+            /**
+             * *add
+             * @param {Object} obj 对象
+             * @return {Object} 接口对象 
+             * */
+            add(obj) {
+                logic = { ...logic, ...obj };
+                return this;
+            }
+        }
+    },
+    /**
+     * *备忘录模式
+     * @property cache 缓存器
+     * @method add 缓存方法
+     * @method get 获取方法
+     * todo 缓存的键不能有重复的 否则就替换了
+     *  */
+    MemoModel: function () {
+        // 安全模式
+        if (new.target !== ObjectKit.MemoModel) return new ObjectKit.MemoModel();
+        this.cache = new Map();
+        this.add = function (key, value) {
+            this.cache.set(key, value);
+        }
+        this.get = function (key) {
+            return this.cache.get(key);
+        }
+        this.has = function (key) {
+            return this.cache.has(key);
+        }
+    },
+    /**
+     * afterPerform 之后执行
+     * @param {Function} callback 执行函数
+     * @param {Function} condition 满足条件  使用传参调用
+     * @param {Number} delay 延迟时间
+     * todo 轨迹播放就用到过，在不同的函数中，要等待地图加载完毕，才能执行
+     *  */
+    afterPerform(callback, condition = function () { return true }, delay = 400) {
+        if (condition()) {
+            callback();
+        } else {
+            setTimeout(() => {
+                ObjectKit.afterPerform(callback, condition, delay)
+            }, delay)
+        }
     }
 }
 

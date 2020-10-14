@@ -30,9 +30,29 @@ var FormKit_Operation = {
             else ele = form.querySelector('[name=' + key + ']');
             if (ele) ele.value = params[key];
         }
+    },
+    /**
+     * * 其他格式转formData
+     * @param {Any} data 数据源
+     * @return {FormData} formData数据
+     */
+    toFormData(data) {
+        let type = Object.prototype.toString.call(data);
+        switch (type) {
+            case "[object Object]":
+                return Object.entries(data).reduce((t, v) => {
+                    Reflect.apply(t.append, t, v);
+                    return t;
+                }, new FormData());
+            case "[object Array]":
+                return Object.entries(data).reduce((t, v) => {
+                    Reflect.apply(t.append, t, v);
+                    return t;
+                }, new FormData());
+        }
     }
-}
 
+}
 // verify 
 var FormKit_Verify = {
 

@@ -68,6 +68,17 @@ var MathKit_Compute = {
         r1 = Number(arg1.toString().replace('.', ''));
         r2 = Number(arg2.toString().replace('.', ''));
         return (r1 / r2) * Math.pow(10, t2 - t1);
+    },
+    // 生成n个随机字母
+    randomCoding(n) {
+        //创建26个字母数组
+        let database = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+            text = [];
+        database.push(...database.map(item => item.toLowerCase()));
+        for (var i = 0; i < n; i++) {
+            text.push(database[Math.floor(Math.random() * 48)]);
+        }
+        return text.join('');
     }
 }
 

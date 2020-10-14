@@ -5,7 +5,19 @@ var ArrayKit_Context = {
 
     dateSort(data) {
         return Object.keys(data).sort().map(item => data[item]);
-    },
+    }, assignSort: function (target, sortby, assign) {
+        const arr = [], copyTarget = JSON.parse(JSON.stringify(target));
+        assign.forEach((assignItem, assignIndex) => {
+
+            let cindex = copyTarget.findIndex(citem => sortby(citem, assignItem));
+            if (cindex !== -1) {
+                arr[assignIndex] = JSON.parse(JSON.stringify(copyTarget[cindex]));
+                copyTarget.splice(cindex, 1);
+            };
+        })
+        return arr;
+    }
+
 }
 
 
@@ -60,6 +72,9 @@ const DateKit = {
         let month = date.getMonth(),
             year = date.getFullYear();
         return new Date(year, month - 1, 1);
+    },
+    currentMonth: function () {
+        return new Date();
     },
     nextMonth: function (date) {
         if (date) date = new Date(date);
@@ -185,9 +200,23 @@ var FormKit_Operation = {
             else ele = form.querySelector('[name=' + key + ']');
             if (ele) ele.value = params[key];
         }
+    }, toFormData(data) {
+        let type = Object.prototype.toString.call(data);
+        switch (type) {
+            case "[object Object]":
+                return Object.entries(data).reduce((t, v) => {
+                    Reflect.apply(t.append, t, v);
+                    return t;
+                }, new FormData());
+            case "[object Array]":
+                return Object.entries(data).reduce((t, v) => {
+                    Reflect.apply(t.append, t, v);
+                    return t;
+                }, new FormData());
+        }
     }
-}
 
+}
 
 var FormKit_Verify = {
 
@@ -361,6 +390,17 @@ var MathKit_Compute = {
         r1 = Number(arg1.toString().replace('.', ''));
         r2 = Number(arg2.toString().replace('.', ''));
         return (r1 / r2) * Math.pow(10, t2 - t1);
+    },
+
+    randomCoding(n) {
+
+        let database = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+            text = [];
+        database.push(...database.map(item => item.toLowerCase()));
+        for (var i = 0; i < n; i++) {
+            text.push(database[Math.floor(Math.random() * 48)]);
+        }
+        return text.join('');
     }
 }
 
@@ -462,10 +502,92 @@ window.ObjectKit = {
             if (remaining <= 0) {
                 handle.apply(context, args);
                 startTime = Date.parse(new Date());
-            } else
+            } else {
                 timer = setTimeout(handle, remaining);
+            }
         }
-    }
+    }, Observer: function () {
+        const list = {};
+        this.on = function (type, fn) {
+            !list[type] && (list[type] = new Set());
+            list[type].add(fn)
+        }
+        this.emit = function (type, args) {
+            let event = { type: type, params: args }
+            list[type] && list[type].forEach(fn => fn.call(undefined, event));
+        }
+        this.off = function (type, fn) {
+            list[type] && list[type].delete(fn);
+        }
+    }, StateModel: function (states) {
+
+        if (new.target !== ObjectKit.StateModel) { return new ObjectKit.StateModel(states) }
+        let currentState = {};
+
+        let constrol = {
+            change(...args) {
+                let i = 0, len = args.length;
+
+                currentState = {};
+
+                for (; i < len; i++) {
+                    currentState[args[i]] = true;
+                }
+                return this;
+            },
+            run() {
+                for (let key in currentState) {
+                    states[key] && states[key]();
+                }
+                return this;
+            }
+
+        }
+        return constrol;
+
+    }, CommandModel: function (command = {}) {
+        if (new.target !== ObjectKit.CommandModel) return new ObjectKit.CommandModel(command);
+        return {
+            execute(args) {
+
+                if (Object.prototype.toString.call(args) === '[object Array]') {
+                    args.forEach(this.execute)
+                }
+                let cmd = args['cmd'],
+                    params = args['params'] || []
+                return command && command[cmd] && command[cmd](...params);
+            }
+        }
+    }, Flyweight: function (logic = {}) {
+        if (new.target !== ObjectKit.Flyweight) return new ObjectKit.Flyweight(logic);
+        return {
+            call(args) {
+
+                if (Object.prototype.toString.call(args) === '[object Array]') {
+                    args.forEach(this.call)
+                }
+                let share = args['share'],
+                    params = args['params'] || []
+                return logic && logic[share] && logic[share](...params);
+            }, add(obj) {
+                logic = { ...logic, ...obj };
+                return this;
+            }
+        }
+    }, MemoModel: function () {
+
+        if (new.target !== ObjectKit.MemoModel) return new ObjectKit.MemoModel();
+        this.cache = new Map();
+        this.add = function (key, value) {
+            this.cache.set(key, value);
+        }
+        this.get = function (key) {
+            return this.cache.get(key);
+        }
+        this.has = function (key) {
+            return this.cache.has(key);
+        }
+    },
 }
 
 

@@ -50,6 +50,9 @@ const DateKit = {
             year = date.getFullYear();
         return new Date(year, month - 1, 1);
     },
+    currentMonth: /* 获取当前月份的Date对象 */function () {
+        return new Date();
+    },
     nextMonth: /* 获取下一个月的Date对象 */ function (date) {
         if (date) date = new Date(date);
         date = new Date();
@@ -63,7 +66,6 @@ const DateKit = {
         if (date) date = new Date(date);
         else date = new Date();
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
-
     },
     /**
      * *根据某分,某小时，某日，某月，某年获取时间段 
