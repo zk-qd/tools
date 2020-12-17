@@ -79,6 +79,27 @@ var MathKit_Compute = {
             text.push(database[Math.floor(Math.random() * 48)]);
         }
         return text.join('');
+    },
+    // 传入 rgba(225,225,225) 生成十六进制颜色
+    // 目前还透明还不能处理
+    rgbtohex(rgb) {
+        let { r, g, b } = rgb.match(/rgb\(\s*(?<r>\d*),\s*(?<g>\d*),\s*(?<b>\d*)\)/).groups;
+        r = Number(r).toString(16).padStart(2, 0);
+        g = Number(g).toString(16).padStart(2, 0);
+        b = Number(b).toString(16).padStart(2, 0);
+        return '#' + r + g + b;
+    },
+    // hex转rgb
+    hextorgb(hex) {
+        if (hex.length == 4 || hex.length == 7) {
+            let len = (hex.length - 1) / 3;
+            return 'rgb(' + hex.replace(/#/, '').match(new RegExp(`[0-9A-z]{${len}}`, 'g'))
+                .map(item => parseInt(item.repeat(len == 1 ? 2 : 1), 16)).reduce((t, v, i) => {
+                    return t + ',' + v
+                }) + ')';
+        } else {
+            throw new TypeError('hex type error! ' + hex)
+        }
     }
 }
 
