@@ -40,7 +40,7 @@ var ArrayKit_Context = {
      *  */
     sort(target, type = 'up', key) {
         target.sort((value1, value2) => {
-            if (type == 'down') ([value2, value1]) = [value1, value2] // 降序
+            if (type == 'down') [value2, value1] = [value1, value2] // 降序
             if (key) {
                 // 有key比较key的值
                 return value1[key].toString().localeCompare(value2[key].toString());

@@ -15,7 +15,7 @@ var ArrayKit_Context = {
         return arr;
     },sort(target, type = 'up', key) {
         target.sort((value1, value2) => {
-            if (type == 'down') ([value2, value1]) = [value1, value2]
+            if (type == 'down') [value2, value1] = [value1, value2]
             if (key) {
                 return value1[key].toString().localeCompare(value2[key].toString());
             } else {
