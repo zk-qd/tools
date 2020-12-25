@@ -43,7 +43,7 @@ const DateKit = {
     format: function (date, format = 'yyyy-MM-dd', dt = true) {
         if (!date && dt) date = new Date();
         else if (!date && !dt) return '';
-        
+
         else if (date.toString().length == 8) date = this.parseSerialDate(date); // 20201010 格式
         else date = new Date(date);
         // 注意月份是 MM 分钟是mm ，只有h和a既有大写又有小写，单个字母不补零
@@ -185,12 +185,13 @@ const DateKit = {
      * 距离当天的时间
      * @param {Number} day 距离当天多少天
      * @todo day的值可为正负  为正则获取 未来日期  为负则获取 过去日期
+     * @param {Number} h 小时 当天几点,默认当前小时，而一般插件取的都是0点
+     * @todo h的值 => [undefined,0,8]
      * @return {Date} 返回时间对象 精确到天
      *  */
-    distanceDate: function (day = 0) {
-        let date = new Date();
+    distanceDate: function (day = 0, h = new Date().getHours()) {
+        let date = new Date(new Date().getFullYear(), new Date().getMonth, new Date().getDate(), h);
         return new Date(date.getTime() + 24 * 3600 * 1000 * day)
-
     },
     /**
      * 获取24时

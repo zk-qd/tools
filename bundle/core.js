@@ -66,7 +66,7 @@ const DateKit = {
     },format: function (date, format = 'yyyy-MM-dd', dt = true) {
         if (!date && dt) date = new Date();
         else if (!date && !dt) return '';
-        
+
         else if (date.toString().length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
         const list = [
@@ -184,10 +184,9 @@ const DateKit = {
                     end: new Date(year, month, day, hour, minute, 59),
                 };
         }
-    },distanceDate: function (day = 0) {
-        let date = new Date();
+    },distanceDate: function (day = 0, h = new Date().getHours()) {
+        let date = new Date(new Date().getFullYear(), new Date().getMonth, new Date().getDate(), h);
         return new Date(date.getTime() + 24 * 3600 * 1000 * day)
-
     },get24Hour() {
         return '.'.repeat(23).split('.').map((item, index) => index.toString().padStart(2, '0') + ':00')
     },get48Hour() {
