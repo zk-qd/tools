@@ -81,7 +81,7 @@ window.ObjectKit = {
         }
     },
 
-    throttle: function (handle, delay = 500) /* 节流阀 */ {
+    throttle: function (handle, delay = 500, immediate = true) /* 节流阀 */ {
         let timer = null,
             // 初始化一个开始时间
             startTime = Date.parse(new Date()),
@@ -95,11 +95,19 @@ window.ObjectKit = {
             remaining = delay - (curTime - startTime);
             context = this;
             clearTimeout(timer);
-            if (remaining <= 0) { // 上一个周期内已经完了
+            if (immediate) {
+                execute();
+                immediate = false;
+            } else {
+                if (remaining <= 0) { // 上一个周期内已经完了
+                    execute();
+                } else {// 还在同一个周期内
+                    timer = setTimeout(handle, remaining);
+                }
+            }
+            function execute() {
                 handle.apply(context, args);
                 startTime = Date.parse(new Date());
-            } else {// 还在同一个周期内
-                timer = setTimeout(handle, remaining);
             }
         }
     },
@@ -107,30 +115,45 @@ window.ObjectKit = {
      * *观察者 
      * todo observer = new Observer();
      * ? observer.on(type,fn) 消息订阅
-     * @param {String} 事件类型
-     * @param {Function} 处理函数
+     * @param {String} type 事件类型
+     * @param {Function} fn 处理函数
      * !一个type可以绑定多个处理函数
      * ? observer.emit(type,args) 消息发布
-     * @param {String} 事件类型
-     * @param {args} 参数
+     * @param {String} type 事件类型
+     * @param {Any} args 参数
+     * @param {Boolean} async 参数 20201023
      * !触发type绑定的所有函数
+     * !默认异步触发（一个类型的各个函数相对同步，函数相对其他异步）
      * ? observer.off(type,fn) 注销订阅
-     * @param {String} 事件类型
-     * @param {Function} 处理函数
-     * ! 注销一个类型的其中一个函数
+     * @param {String} type 事件类型
+     * @param {Function} fn 处理函数
+     * ! 如果有fn注销一个类型的其中一个函数，如果没有fn注销整个类型，如果不传入参数，那么注销所有事件
+     * ! 多个发布者可以，但是多个订阅者就要注意了
+     * 
     */
     Observer: function () {
         const list = {};
         this.on = function (type, fn) {
             !list[type] && (list[type] = new Set());
             list[type].add(fn)
+            return this;
         }
-        this.emit = function (type, args) {
+        this.emit = function (type, args, async = true) {
             let event = { type: type, params: args }
-            list[type] && list[type].forEach(fn => fn.call(undefined, event));
+            run(() => { list[type] && list[type].forEach(fn => fn.call(undefined, event)) }); // 传名
+            function run(callback) {
+                if (async) setTimeout(callback);
+                else callback();
+            }
+            return this;
         }
         this.off = function (type, fn) {
-            list[type] && list[type].delete(fn);
+            if (type) {
+                list[type] && (fn ? list[type].delete(fn) : delete list[type])
+            } else {
+                list = {};
+            }
+            return this
         }
     },
     /**
@@ -179,13 +202,15 @@ window.ObjectKit = {
      * */
     CommandModel: function (command = {}) {
         if (new.target !== ObjectKit.CommandModel) return new ObjectKit.CommandModel(command);
-        return {
+        return {  
             /** 
              * *执行命令方法 
              * execute(args)
              * @param {Object or Array} args 如果是对象那么直接执行，如果是数组，那么递归执行
              * @return {Any} 返回方法的返回值
              * ! args的格式: [{cmd: '命令名称',params: ['参数列表']}]
+             * @param {String} cmd 命令名称
+             * @param {Any} params 参数 不是传入数组的话最终也会包装成数组
              * 
              * */
             execute(args) {
@@ -195,6 +220,10 @@ window.ObjectKit = {
                 }
                 let cmd = args['cmd'], // 命令
                     params = args['params'] || [];// 参数
+                // 适配参数
+                if (!(params instanceof Array)) {
+                    params = [params];
+                }
                 return command && command[cmd] && command[cmd](...params);
             }
         }

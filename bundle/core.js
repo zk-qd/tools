@@ -1,14 +1,11 @@
 //Array.js
 
 var ArrayKit_Context = {
-
-
     dateSort(data) {
         return Object.keys(data).sort().map(item => data[item]);
-    }, assignSort: function (target, sortby, assign) {
+    },assignSort: function (target, sortby, assign) {
         const arr = [], copyTarget = JSON.parse(JSON.stringify(target));
         assign.forEach((assignItem, assignIndex) => {
-
             let cindex = copyTarget.findIndex(citem => sortby(citem, assignItem));
             if (cindex !== -1) {
                 arr[assignIndex] = JSON.parse(JSON.stringify(copyTarget[cindex]));
@@ -34,13 +31,12 @@ const DateKit_Schema = {
 }
 const DateKit = {
     ...DateKit_Schema,
-    dateFormat: function (date, format) {
+    dateFormat:function (date, format) {
 
         if (!date) date = new Date();
         else if (date.toString().length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
         if (!format) format = 'yyyy-MM-dd';
-
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
@@ -49,48 +45,100 @@ const DateKit = {
             { match: 'mm', val: date.getMinutes().toString().padStart(2, '0') },
             { match: 'ss', val: date.getSeconds().toString().padStart(2, '0') },
         ]
+
         for (let i = 0, length = list.length; i < length; i++) {
             const item = list[i];
             const reg = new RegExp(item.match);
             format = format.replace(reg, item.val);
         }
         return format;
-    }, dayOfMonth: function (date) {
+
+    },format: function (date, format, dt = true) {
+        if (!date && dt) date = new Date();
+        else if (!date && !dt) return '';
+        else if (date.toString().length == 8) date = this.parseSerialDate(date);
+        else date = new Date(date);
+        if (!format) format = 'yyyy-MM-dd';
+        const list = [
+            { match: 'yyyy', val: date.getFullYear() },
+            { match: 'MM', val: fillZore(date.getMonth() + 1) },
+            { match: 'M', val: date.getMonth() + 1 },
+            { match: 'dd', val: fillZore(date.getDate().toString()) },
+            { match: 'd', val: date.getDate().toString() },
+            { match: 'HH', val: fillZore(date.getHours().toString()) },
+            { match: 'H', val: date.getHours().toString() },
+            { match: 'hh', val: fillZore(hour12()) },
+            { match: 'h', val: hour12() },
+            { match: 'mm', val: fillZore(date.getMinutes().toString()) },
+            { match: 'm', val: date.getMinutes().toString() },
+            { match: 'ss', val: fillZore(date.getSeconds().toString()) },
+            { match: 's', val: date.getSeconds().toString() },
+            { match: 'WW', val: fillZore(week().toString()) },
+            { match: 'W', val: week().toString() },
+            { match: 'A', val: apm('Upper') },
+            { match: 'a', val: apm('Lower') },
+            { match: 'timestamp', val: date.getTime() },
+        ]
+        for (let i = 0, length = list.length; i < length; i++) {
+            const item = list[i];
+            const reg = new RegExp(item.match);
+            format = format.replace(reg, item.val);
+        }
+        return format;
+        function hour12() {
+            let hour = date.getHours();
+            hour = hour > 12 ? hour - 12 : hour;
+            return hour.toString();
+        }
+        function apm(cases) {
+            let hour = date.getHours(),
+                temp = hour > 12 ? 'pm' : 'am';
+            return temp['to' + cases + 'Case']()
+        }
+        function week() {
+            let w = date.getDay();
+            return w == 0 ? 7 : w;
+        }
+        function fillZore(value) {
+            return value.toString().padStart(2, '0')
+        }
+    },dayOfMonth:function (date) {
         if (date) {
             date = new Date(date);
         } else {
-
             date = new Date();
         }
         let year = date.getFullYear(),
             month = date.getMonth();
         return new Date(year, month + 1, 0).getDate();
     },
-    prevMonth: function (date) {
+
+
+
+    prevMonth:function (date) {
         if (date) date = new Date(date);
-        date = new Date();
+        else date = new Date();
         let month = date.getMonth(),
             year = date.getFullYear();
         return new Date(year, month - 1, 1);
     },
-    currentMonth: function () {
+    currentMonth:function () {
         return new Date();
     },
-    nextMonth: function (date) {
+    nextMonth:function (date) {
         if (date) date = new Date(date);
-        date = new Date();
+        else date = new Date();
         let month = date.getMonth(),
             year = date.getFullYear();
         return new Date(year, month + 1, 1);
     },
-    timeAndDate: function (time, date) {
+    timeAndDate:function (time, date) {
         if (time) time = new Date(time);
         else time = new Date();
         if (date) date = new Date(date);
         else date = new Date();
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds());
-
-    }, intervalOfDate: function (type, date) {
+    },intervalOfDate: function (type, date) {
         if (date) date = new Date(date);
         else date = new Date();
         let year = date.getFullYear(),
@@ -126,16 +174,38 @@ const DateKit = {
                     end: new Date(year, month, day, hour, minute, 59),
                 };
         }
+    },distanceDate: function (day = 0) {
+        let date = new Date();
+        return new Date(date.getTime() + 24 * 3600 * 1000 * day)
+
+    },get24Hour() {
+        return '.'.repeat(23).split('.').map((item, index) => index.toString().padStart(2, '0') + ':00')
+    },get48Hour() {
+        return DateKit.get24Hour().map(item => [item, item.replace(/:00/, ':30')]).flat(1);
+    },get30Date(date, format = 'yyyy-MM-dd') {
+        let { end } = DateKit.intervalOfDate('month', date),
+            year = end.getFullYear(),
+            month = end.getMonth();
+        return '.'.repeat(end.getDate() - 1).split('.').map((item, index) => {
+            return DateKit.format(new Date(year, month, index + 1), format)
+        })
+
+    },get12Month(date, format = "yyyy-MM") {
+        let year;
+        date = date ? new Date(date) : new Date();
+        year = date.getFullYear();
+        return '.'.repeat(11).split('.').map((item, index) => {
+            return DateKit.format(new Date(year, index), format);
+        })
     }
+
 }
 window.DateKit = DateKit;
-
 console.log(DateKit.dateFormat('20200401', 'yyyy-MM-dd hh:mm:ss'));
 console.log(DateKit.dayOfMonth())
 console.log(DateKit.prevMonth())
 //Dom.js
 window.DomKit = {
-
     copyText(dom) {
         return new Promise((resolve, reject) => {
             try {
@@ -161,17 +231,15 @@ window.DomKit = {
 //Encrypt.js
 
 
-window.EncryptKit = {
-    idNum(val) {
+window.EncryptKit = {idNum(val) {
         if (!val) return val;
         return val.toString().replace(/(\d{3})\d{11}(\d{4}|\d{3}[A-Z]{1})/, "$1" + "*".repeat(11) + "$2");
     }
 }
 //Form.js
-// operation
-var FormKit_Operation = {
 
-    getForm({ formSel, prefix } = ErrorKit.emptyParameterException()) {
+var FormKit_Operation = {
+    getForm({ formSel, prefix } =ErrorKit.emptyParameterException()) {
         var form = document.querySelector(formSel);
         if (!form) return FormKit_Message['form-notExist'];
         var data = form.serializeArray();
@@ -188,19 +256,16 @@ var FormKit_Operation = {
         }
         return data;
     },
-
-    setForm({ formSel, prefix, params } = ErrorKit.emptyParameterException()) {
-
+    setForm({ formSel, prefix, params } =ErrorKit.emptyParameterException()) {
         const form = document.querySelector(formSel);
         if (!form) return FormKit_Message['form-notExist'];
-
         let ele;
         for (var key in params) {
             if (prefix) ele = form.querySelector('[name=' + prefix + key + ']');
             else ele = form.querySelector('[name=' + key + ']');
             if (ele) ele.value = params[key];
         }
-    }, toFormData(data) {
+    },toFormData(data) {
         let type = Object.prototype.toString.call(data);
         switch (type) {
             case "[object Object]":
@@ -217,11 +282,9 @@ var FormKit_Operation = {
     }
 
 }
-
 var FormKit_Verify = {
 
 }
-
 var FormKit_Message = {
     ['form-notExist']: 'The form doesn\'t exist',
 }
@@ -238,7 +301,6 @@ window.FormKit = {
 var HttpKit_Judge = {
 
 }
-
 var HttpKit_Uri = {
     query2string(...params) {
         params = params.reduce((total, item) => ({ ...total, ...item }), {})
@@ -248,18 +310,15 @@ var HttpKit_Uri = {
                 querystring += key + '=' + params[key];
                 querystring += '&';
             }
-
             if (querystring.match(/&$/g)) querystring = querystring.slice(0, querystring.length - 1);
             return querystring;
         }
     },
     uri3query(uri, ...params) {
         var querystring = this.query2string(...params);
-
         uri.indexOf('?') == -1 ? uri += '?' + querystring : uri += querystring;
         return uri;
     },
-
     clear1void(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -267,7 +326,6 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-
     clear1allVoid(obj) {
         for (let key in obj) {
             let value = obj[key]
@@ -275,7 +333,6 @@ var HttpKit_Uri = {
         }
         return obj;
     },
-
     clear1assignVoid(obj, assign = [], filter = 'clear1allVoid') {
         obj = this[filter](obj);
         for (let key in obj) {
@@ -294,7 +351,6 @@ window.HttpKit = {
 }
 
 //Judge.js
-
 
 var JudgeKit_Judge = {
     void2empty(value) {
@@ -325,7 +381,6 @@ window.JudgeKit = {
 
 
 var MathKit_Compute = {
-
     add(arg1, arg2) {
         let r1, r2, m;
         try {
@@ -341,7 +396,6 @@ var MathKit_Compute = {
         m = Math.pow(10, Math.max(r1, r2));
         return (arg1 * m + arg2 * m) / m;
     },
-
     subtract(arg1, arg2) {
         let r1, r2, m, n;
         try {
@@ -355,11 +409,9 @@ var MathKit_Compute = {
             r2 = 0;
         }
         m = Math.pow(10, Math.max(r1, r2));
-
         n = r1 >= r2 ? r1 : r2;
         return ((arg1 * m - arg2 * m) / m).toFixed(2);
     },
-
     multiply(arg1, arg2) {
         let m = 0,
             s1 = arg1.toString(),
@@ -375,7 +427,6 @@ var MathKit_Compute = {
             Math.pow(10, m)
         );
     },
-
     divide(arg1, arg2) {
         let t1 = 0,
             t2 = 0,
@@ -391,9 +442,7 @@ var MathKit_Compute = {
         r2 = Number(arg2.toString().replace('.', ''));
         return (r1 / r2) * Math.pow(10, t2 - t1);
     },
-
     randomCoding(n) {
-
         let database = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
             text = [];
         database.push(...database.map(item => item.toLowerCase()));
@@ -401,6 +450,13 @@ var MathKit_Compute = {
             text.push(database[Math.floor(Math.random() * 48)]);
         }
         return text.join('');
+    },
+    rgbtohex(rgb) {
+        let { r, g, b } = rgb.match(/rgb\(\s*(?<r>\d*),\s*(?<g>\d*),\s*(?<b>\d*)\)/).groups;
+        r = Number(r).toString(16).padStart(2, 0);
+        g = Number(g).toString(16).padStart(2, 0);
+        b = Number(b).toString(16).padStart(2, 0);
+        return '#' + r + g + b;
     }
 }
 
@@ -423,13 +479,11 @@ window.ObjectKit = {
                 o[i] = this.deepCopy(obj[i]);
             }
         } else {
-
             o = obj.valueOf();
         }
         return o;
-    }, debounce: function (handle, delay = 400) {
+    },debounce: function (handle, delay = 400){
         let timer = null,
-
             cancel = null;
         return async function (...args) {
             return new Promise((resolve, reject) => {
@@ -450,13 +504,11 @@ window.ObjectKit = {
     debounce(handler, delay = 400, immediate = true) {
         let timer = null,
             cancle;
-
         return function (...args) {
             return new Promise((resolve, reject) => {
                 let content = this;
                 if (timer) clearTimeout(timer);
                 if (cancle) cancle(timer);
-
                 if (immediate) {
                     execute();
                     immediate = false;
@@ -466,18 +518,15 @@ window.ObjectKit = {
                     }, delay);
                 }
                 cancle = () => {
-
                     reject("请勿频繁操作");
                 };
                 function execute() {
-
                     let returned = handler.apply(content, args);
                     if (Promise[Symbol.hasInstance](returned)) {
                         returned.then((res) => {
                             resolve(res);
                         });
                     } else {
-
                         resolve(returned)
                     }
                 }
@@ -485,51 +534,59 @@ window.ObjectKit = {
         }
     },
 
-    throttle: function (handle, delay = 500) {
+    throttle: function (handle, delay = 500, immediate = true){
         let timer = null,
-
             startTime = Date.parse(new Date()),
-
             curTime,
-
             remaining,
             context;
-        return function (...args) {
+        return function (...args){
             curTime = Date.parse(new Date());
             remaining = delay - (curTime - startTime);
             context = this;
             clearTimeout(timer);
-            if (remaining <= 0) {
+            if (immediate) {
+                execute();
+                immediate = false;
+            } else {
+                if (remaining <= 0) {
+                    execute();
+                } else {
+                    timer = setTimeout(handle, remaining);
+                }
+            }
+            function execute() {
                 handle.apply(context, args);
                 startTime = Date.parse(new Date());
-            } else {
-                timer = setTimeout(handle, remaining);
             }
         }
-    }, Observer: function () {
+    },Observer: function () {
         const list = {};
         this.on = function (type, fn) {
             !list[type] && (list[type] = new Set());
             list[type].add(fn)
+            return this;
         }
-        this.emit = function (type, args) {
+        this.emit = function (type, args, async = true) {
             let event = { type: type, params: args }
-            list[type] && list[type].forEach(fn => fn.call(undefined, event));
+            run(() => { list[type] && list[type].forEach(fn => fn.call(undefined, event)) });
+            function run(callback) {
+                if (async) setTimeout(callback);
+                else callback();
+            }
+            return this;
         }
         this.off = function (type, fn) {
-            list[type] && list[type].delete(fn);
+            list[type] && (fn ? list[type].delete(fn) : delete list[type])
+            return this
         }
-    }, StateModel: function (states) {
-
+    },StateModel: function (states) {
         if (new.target !== ObjectKit.StateModel) { return new ObjectKit.StateModel(states) }
         let currentState = {};
-
         let constrol = {
             change(...args) {
                 let i = 0, len = args.length;
-
                 currentState = {};
-
                 for (; i < len; i++) {
                     currentState[args[i]] = true;
                 }
@@ -545,37 +602,32 @@ window.ObjectKit = {
         }
         return constrol;
 
-    }, CommandModel: function (command = {}) {
+    },CommandModel: function (command = {}) {
         if (new.target !== ObjectKit.CommandModel) return new ObjectKit.CommandModel(command);
-        return {
-            execute(args) {
-
+        return {execute(args) {
                 if (Object.prototype.toString.call(args) === '[object Array]') {
                     args.forEach(this.execute)
                 }
                 let cmd = args['cmd'],
-                    params = args['params'] || []
+                    params = args['params'] || [];
                 return command && command[cmd] && command[cmd](...params);
             }
         }
-    }, Flyweight: function (logic = {}) {
+    },Flyweight: function (logic = {}) {
         if (new.target !== ObjectKit.Flyweight) return new ObjectKit.Flyweight(logic);
-        return {
-            call(args) {
-
+        return {call(args) {
                 if (Object.prototype.toString.call(args) === '[object Array]') {
                     args.forEach(this.call)
                 }
                 let share = args['share'],
-                    params = args['params'] || []
+                    params = args['params'] || [];
                 return logic && logic[share] && logic[share](...params);
-            }, add(obj) {
+            },add(obj) {
                 logic = { ...logic, ...obj };
                 return this;
             }
         }
-    }, MemoModel: function () {
-
+    },MemoModel: function () {
         if (new.target !== ObjectKit.MemoModel) return new ObjectKit.MemoModel();
         this.cache = new Map();
         this.add = function (key, value) {
@@ -587,7 +639,15 @@ window.ObjectKit = {
         this.has = function (key) {
             return this.cache.has(key);
         }
-    },
+    },afterPerform(callback, condition = function () { return true }, delay = 400) {
+        if (condition()) {
+            callback();
+        } else {
+            setTimeout(() => {
+                ObjectKit.afterPerform(callback, condition, delay)
+            }, delay)
+        }
+    }
 }
 
 

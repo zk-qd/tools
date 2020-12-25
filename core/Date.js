@@ -6,7 +6,7 @@ const DateKit_Schema = {
 }
 const DateKit = {
     ...DateKit_Schema,
-    dateFormat:/* data format */ function (date, format) {
+    dateFormat:/* data format v1.0 */ function (date, format) {
 
         if (!date) date = new Date();
         else if (date.toString().length == 8) date = this.parseSerialDate(date);
@@ -14,12 +14,58 @@ const DateKit = {
         if (!format) format = 'yyyy-MM-dd';
         // 注意月份是 MM 分钟是mm
         const list = [
+            // 年
             { match: 'yyyy', val: date.getFullYear() },
+            // 月
             { match: 'MM', val: (date.getMonth() + 1 + '').padStart(2, '0') },
             { match: 'dd', val: date.getDate().toString().padStart(2, '0') },
             { match: 'hh', val: date.getHours().toString().padStart(2, '0') },
             { match: 'mm', val: date.getMinutes().toString().padStart(2, '0') },
             { match: 'ss', val: date.getSeconds().toString().padStart(2, '0') },
+        ]
+
+        for (let i = 0, length = list.length; i < length; i++) {
+            const item = list[i];
+            const reg = new RegExp(item.match);
+            format = format.replace(reg, item.val);
+        }
+        return format;
+
+    },
+    /**
+     * 格式化时间 v1.1
+     * @param {Any} date 任意能够转时间的数据
+     * @param {String} format 模板格式
+     * @param {Boolean} dt 是否存在默认时间 
+     * @return {String} 时间 
+     *  */
+
+    format: function (date, format = 'yyyy-MM-dd', dt = true) {
+        if (!date && dt) date = new Date();
+        else if (!date && !dt) return '';
+        
+        else if (date.toString().length == 8) date = this.parseSerialDate(date); // 20201010 格式
+        else date = new Date(date);
+        // 注意月份是 MM 分钟是mm ，只有h和a既有大写又有小写，单个字母不补零
+        const list = [
+            { match: 'yyyy', val: date.getFullYear() }, // 年份
+            { match: 'MM', val: fillZore(date.getMonth() + 1) }, // 月份 补零
+            { match: 'M', val: date.getMonth() + 1 }, // 月份 不补零
+            { match: 'dd', val: fillZore(date.getDate().toString()) }, // 天 补零
+            { match: 'd', val: date.getDate().toString() }, // 天 不补零
+            { match: 'HH', val: fillZore(date.getHours().toString()) }, // 小时 24制 补零
+            { match: 'H', val: date.getHours().toString() }, // 小时 24制 不补零
+            { match: 'hh', val: fillZore(hour12()) }, // 小时 12制 补零
+            { match: 'h', val: hour12() }, // 小时 12制 不补零
+            { match: 'mm', val: fillZore(date.getMinutes().toString()) }, // 分钟 补零
+            { match: 'm', val: date.getMinutes().toString() }, // 分钟 不补零
+            { match: 'ss', val: fillZore(date.getSeconds().toString()) }, // 秒 补零
+            { match: 's', val: date.getSeconds().toString() }, // 秒 不补零
+            { match: 'WW', val: fillZore(week().toString()) }, // AM or PM
+            { match: 'W', val: week().toString() }, // am or pm
+            { match: 'A', val: apm('Upper') }, // AM or PM
+            { match: 'a', val: apm('Lower') }, // am or pm
+            { match: 'timestamp', val: date.getTime() }, // am or pm
         ]
         for (let i = 0, length = list.length; i < length; i++) {
             const item = list[i];
@@ -27,6 +73,27 @@ const DateKit = {
             format = format.replace(reg, item.val);
         }
         return format;
+        // 24小时转12小时制
+        function hour12() {
+            let hour = date.getHours();
+            hour = hour > 12 ? hour - 12 : hour;
+            return hour.toString();
+        }
+        // 判断上午还是下午
+        function apm(cases) {
+            let hour = date.getHours(),
+                temp = hour > 12 ? 'pm' : 'am';
+            return temp['to' + cases + 'Case']()
+        }
+        // 周 1234560 => 1234567
+        function week() {
+            let w = date.getDay();
+            return w == 0 ? 7 : w;
+        }
+        // 补零
+        function fillZore(value) {
+            return value.toString().padStart(2, '0')
+        }
     },
     /**
      * @param {Any} date 传入时间 格式可以被new Date转化就行了
@@ -43,9 +110,12 @@ const DateKit = {
             month = date.getMonth();
         return new Date(year, month + 1, 0).getDate();
     },
+
+
+
     prevMonth: /* 获取上个月的Date对象 */function (date) {
         if (date) date = new Date(date);
-        date = new Date();
+        else date = new Date();
         let month = date.getMonth(),
             year = date.getFullYear();
         return new Date(year, month - 1, 1);
@@ -55,7 +125,7 @@ const DateKit = {
     },
     nextMonth: /* 获取下一个月的Date对象 */ function (date) {
         if (date) date = new Date(date);
-        date = new Date();
+        else date = new Date();
         let month = date.getMonth(),
             year = date.getFullYear();
         return new Date(year, month + 1, 1);
@@ -110,7 +180,54 @@ const DateKit = {
                     end: new Date(year, month, day, hour, minute, 59),
                 };
         }
+    },
+    /**
+     * 距离当天的时间
+     * @param {Number} day 距离当天多少天
+     * @todo day的值可为正负  为正则获取 未来日期  为负则获取 过去日期
+     * @return {Date} 返回时间对象 精确到天
+     *  */
+    distanceDate: function (day = 0) {
+        let date = new Date();
+        return new Date(date.getTime() + 24 * 3600 * 1000 * day)
+
+    },
+    /**
+     * 获取24时
+     *  */
+    get24Hour() {
+        return '.'.repeat(23).split('.').map((item, index) => index.toString().padStart(2, '0') + ':00')
+    },
+    /**
+     * 获取48时
+     *  */
+    get48Hour() {
+        return DateKit.get24Hour().map(item => [item, item.replace(/:00/, ':30')]).flat(1);
+    },
+    /**
+     * 获取一个月的所有天
+     *  */
+    get30Date(date, format = 'yyyy-MM-dd') {
+        let { end } = DateKit.intervalOfDate('month', date),
+            year = end.getFullYear(),
+            month = end.getMonth();
+        return '.'.repeat(end.getDate() - 1).split('.').map((item, index) => {
+            return DateKit.format(new Date(year, month, index + 1), format)
+        })
+
+    },
+    /**
+     * 获取一年中的月
+     *  */
+    get12Month(date, format = "yyyy-MM") {
+        let year;
+        date = date ? new Date(date) : new Date();
+        year = date.getFullYear();
+        return '.'.repeat(11).split('.').map((item, index) => {
+            return DateKit.format(new Date(year, index), format);
+        })
     }
+
 }
 window.DateKit = DateKit;
 // 测试
