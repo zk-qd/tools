@@ -185,7 +185,8 @@ const DateKit = {
                 };
         }
     },distanceDate: function (day = 0, h = new Date().getHours()) {
-        let date = new Date(new Date().getFullYear(), new Date().getMonth, new Date().getDate(), h);
+        let current = new Date(),
+            date = new Date(current.getFullYear(), current.getMonth(), current.getDate(), h);
         return new Date(date.getTime() + 24 * 3600 * 1000 * day)
     },get24Hour() {
         return '.'.repeat(23).split('.').map((item, index) => index.toString().padStart(2, '0') + ':00')
