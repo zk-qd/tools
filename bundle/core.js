@@ -13,7 +13,17 @@ var ArrayKit_Context = {
             };
         })
         return arr;
-    }
+    },sort(target, type = 'up', key) {
+        target.sort((value1, value2) => {
+            if (type == 'down') [value2, value1] = [value1, value2]
+            if (key) {
+                return value1[key].toString().localeCompare(value2[key].toString());
+            } else {
+                return value1.localeCompare(value2);
+            }
+        });
+    },
+
 
 }
 
@@ -53,12 +63,12 @@ const DateKit = {
         }
         return format;
 
-    },format: function (date, format, dt = true) {
+    },format: function (date, format = 'yyyy-MM-dd', dt = true) {
         if (!date && dt) date = new Date();
         else if (!date && !dt) return '';
+        
         else if (date.toString().length == 8) date = this.parseSerialDate(date);
         else date = new Date(date);
-        if (!format) format = 'yyyy-MM-dd';
         const list = [
             { match: 'yyyy', val: date.getFullYear() },
             { match: 'MM', val: fillZore(date.getMonth() + 1) },
@@ -457,6 +467,17 @@ var MathKit_Compute = {
         g = Number(g).toString(16).padStart(2, 0);
         b = Number(b).toString(16).padStart(2, 0);
         return '#' + r + g + b;
+    },
+    hextorgb(hex) {
+        if (hex.length == 4 || hex.length == 7) {
+            let len = (hex.length - 1) / 3;
+            return 'rgb(' + hex.replace(/#/, '').match(new RegExp(`[0-9A-z]{${len}}`, 'g'))
+                .map(item => parseInt(item.repeat(len == 1 ? 2 : 1), 16)).reduce((t, v, i) => {
+                    return t + ',' + v
+                }) + ')';
+        } else {
+            throw new TypeError('hex type error! ' + hex)
+        }
     }
 }
 
@@ -577,7 +598,11 @@ window.ObjectKit = {
             return this;
         }
         this.off = function (type, fn) {
-            list[type] && (fn ? list[type].delete(fn) : delete list[type])
+            if (type) {
+                list[type] && (fn ? list[type].delete(fn) : delete list[type])
+            } else {
+                list = {};
+            }
             return this
         }
     },StateModel: function (states) {
@@ -610,6 +635,9 @@ window.ObjectKit = {
                 }
                 let cmd = args['cmd'],
                     params = args['params'] || [];
+                if (!(params instanceof Array)) {
+                    params = [params];
+                }
                 return command && command[cmd] && command[cmd](...params);
             }
         }
